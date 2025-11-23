@@ -272,6 +272,40 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round">
+                                <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                                <path
+                                    d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z">
+                                </path>
+                            </svg>
+                        </div>
+                        <h3>Talk to Grace</h3>
+                        <p class="mb-2">Our Lebanese Virtual Secretary</p>
+                        <div class="assistant-wrapper">
+                            <iframe src="https://iframes.ai/o/1763877348485x435569904433233900?color=10A37F&icon="
+                                allow="microphone" class="assistant-iframe" id="assistantFrame"></iframe>
+                        </div>
+                        <script>
+                            const frame = document.getElementById('assistantFrame');
+                            frame.addEventListener('load', () => {
+                                navigator.permissions.query({
+                                    name: 'microphone'
+                                })
+                                    .then(result => {
+                                        if (result.state === 'granted') {
+                                            console.log('Microphone access already granted');
+                                        } else if (result.state === 'prompt') {
+                                            console.log('User will be prompted for microphone access');
+                                        }
+                                    });
+                            });
+                        </script>
+                    </div>
+
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
                                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
                                 </path>
                                 <polyline points="22,6 12,13 2,6"></polyline>
@@ -296,26 +330,25 @@
                 </div>
 
                 <div class="contact-form-wrapper">
-                    <div style="display: flex; justify-content: center; align-items: center;">
-                        <iframe src="https://iframes.ai/o/1763877348485x435569904433233900?color=10A37F&icon="
-                            allow="microphone" style="width: 100%; height: 200px; border: none;"
-                            id="assistantFrame"></iframe>
-                    </div>
-                    <script>
-                        const frame = document.getElementById('assistantFrame');
-                        frame.addEventListener('load', () => {
-                            navigator.permissions.query({
-                                name: 'microphone'
-                            })
-                                .then(result => {
-                                    if (result.state === 'granted') {
-                                        console.log('Microphone access already granted');
-                                    } else if (result.state === 'prompt') {
-                                        console.log('User will be prompted for microphone access');
-                                    }
-                                });
-                        });
-                    </script>
+                    <form class="contact-form" id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full">Send Message</button>
+                    </form>
                 </div>
             </div>
         </div>
