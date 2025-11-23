@@ -23,13 +23,13 @@ let lastScroll = 0;
 
 window.addEventListener('scroll', () => {
     const currentScroll = window.pageYOffset;
-    
+
     if (currentScroll > 100) {
         nav.classList.add('scrolled');
     } else {
         nav.classList.remove('scrolled');
     }
-    
+
     lastScroll = currentScroll;
 });
 
@@ -54,7 +54,7 @@ const contactForm = document.getElementById('contactForm');
 if (contactForm) {
     contactForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const formData = new FormData(contactForm);
         const data = {
             name: formData.get('name'),
@@ -62,13 +62,13 @@ if (contactForm) {
             phone: formData.get('phone'),
             message: formData.get('message')
         };
-        
+
         // For now, just create a mailto link
         // Later you can integrate with a backend service like Formspree, Netlify Forms, etc.
         const mailtoLink = `mailto:allerick@pirisk.com.au?subject=Contact from ${data.name}&body=Name: ${data.name}%0D%0AEmail: ${data.email}%0D%0APhone: ${data.phone}%0D%0A%0D%0AMessage:%0D%0A${data.message}`;
-        
+
         window.location.href = mailtoLink;
-        
+
         // Show success message
         showNotification('Thank you! Your message has been sent.', 'success');
         contactForm.reset();
@@ -82,7 +82,7 @@ function showNotification(message, type = 'info') {
     if (existingNotification) {
         existingNotification.remove();
     }
-    
+
     // Create notification
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
@@ -100,9 +100,9 @@ function showNotification(message, type = 'info') {
         animation: slideInRight 0.3s ease;
         font-weight: 500;
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     // Remove after 4 seconds
     setTimeout(() => {
         notification.style.animation = 'slideOutRight 0.3s ease';
@@ -193,6 +193,78 @@ document.querySelectorAll('.service-card').forEach((card, index) => {
     card.style.transform = 'translateY(30px)';
     card.style.transition = `all 0.6s ease ${index * 0.1}s`;
     observer.observe(card);
+});
+
+// ==============================================
+// ASSISTABLE GRACE WIDGET INTEGRATION
+// ==============================================
+
+// Talk to Grace Button Handler
+const openGraceBtn = document.getElementById('openGraceBtn');
+
+if (openGraceBtn) {
+    openGraceBtn.addEventListener('click', () => {
+        console.log('Grace button clicked');
+
+        // Try to open Assistable widget
+        if (window.Assistable && typeof window.Assistable.open === 'function') {
+            console.log('Opening Assistable widget');
+            window.Assistable.open();
+        } else if (window.AssistableWidget && typeof window.AssistableWidget.open === 'function') {
+            console.log('Opening AssistableWidget');
+            window.AssistableWidget.open();
+        } else {
+            console.log('Assistable not loaded yet, waiting...');
+            // If not loaded yet, wait and try again
+            setTimeout(() => {
+                if (window.Assistable && typeof window.Assistable.open === 'function') {
+                    window.Assistable.open();
+                } else if (window.AssistableWidget && typeof window.AssistableWidget.open === 'function') {
+                    window.AssistableWidget.open();
+                } else {
+                    console.error('Assistable widget not loaded after waiting');
+                    // Fallback: open in new window
+                    alert('Opening Grace in a new window...');
+                    window.open('https://iframes.ai/o/1763877348485x435569904433233900?color=10A37F', '_blank', 'width=400,height=600');
+                }
+            }, 1500);
+        }
+    });
+}
+
+// Hide the default Assistable bubble (we only want the button to trigger it)
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        // Try multiple selectors for the Assistable bubble
+        const selectors = [
+            '[data-assistable-bubble]',
+            '.assistable-bubble',
+            '#assistable-bubble',
+            '[class*="assistable"]',
+            'iframe[src*="assistable"]'
+        ];
+
+        selectors.forEach(selector => {
+            const bubble = document.querySelector(selector);
+            if (bubble && bubble.tagName !== 'SCRIPT') {
+                console.log('Hiding Assistable bubble:', selector);
+                bubble.style.display = 'none';
+            }
+        });
+    }, 2000);
+});
+
+// Log when Assistable loads
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        if (window.Assistable) {
+            console.log('Assistable loaded successfully');
+        } else if (window.AssistableWidget) {
+            console.log('AssistableWidget loaded successfully');
+        } else {
+            console.warn('Assistable widget may not have loaded. Check network tab for errors.');
+        }
+    }, 3000);
 });
 
 // Log to console
