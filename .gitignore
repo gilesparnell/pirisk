@@ -23,6 +23,8 @@ yarn-error.log*
 # Build outputs
 dist/
 build/
+.next/
+out/
 
 # Environment variables
 .env
@@ -32,3 +34,7 @@ build/
 # Logs
 logs
 *.log
+.vercel
+playwright-report/
+test-results/
+tsconfig.tsbuildinfo

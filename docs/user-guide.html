@@ -191,9 +191,9 @@
   <div class="guide-header">
     <h1>PiTime</h1>
     <p>Voice-activated timesheet and invoice app for PiRisk Management.</p>
-    <span class="version">v0.1 &middot; User Guide</span>
+    <span class="version">v0.6 &middot; User Guide &middot; Updated 4 Apr 2026</span>
     <div class="nav-links">
-      <a class="nav-link green" href="diagrams/plan-progress.html">&#128200; Project Progress (25%)</a>
+      <a class="nav-link green" href="diagrams/plan-progress.html">&#128200; Project Progress (75%)</a>
       <a class="nav-link purple" href="index.html">&#128203; Project Docs</a>
     </div>
   </div>
@@ -211,7 +211,8 @@
       <a class="toc-item" href="#invoices"><span class="toc-num">07</span> Invoices</a>
       <a class="toc-item" href="#dashboard"><span class="toc-num">08</span> Dashboard</a>
       <a class="toc-item" href="#settings"><span class="toc-num">09</span> Settings</a>
-      <a class="toc-item" href="#tips"><span class="toc-num">10</span> Tips &amp; Tricks</a>
+      <a class="toc-item" href="#shortcuts"><span class="toc-num">10</span> Keyboard Shortcuts</a>
+      <a class="toc-item" href="#tips"><span class="toc-num">11</span> Tips &amp; Tricks</a>
     </div>
   </div>
 
@@ -336,7 +337,7 @@
       <div><h2>Voice Entry</h2><div class="section-sub">Speak naturally to log time</div></div>
     </div>
     <p style="font-size:13px;color:var(--text2);margin-bottom:16px">
-      PiTime uses <strong>Wispr Flow</strong> (OS-level speech-to-text) which types spoken words directly into the browser. A local fuzzy parser then extracts structured data from the natural language text.
+      PiTime uses <strong>Wispr Flow</strong> (OS-level speech-to-text) which types spoken words directly into the browser. A local fuzzy parser then extracts structured data from the natural language text. Press <strong>Ctrl+N</strong> from anywhere to jump straight to the voice entry field.
     </p>
     <table class="ref-table">
       <thead><tr><th>You Say</th><th>PiTime Extracts</th></tr></thead>
@@ -345,12 +346,18 @@
         <tr><td>"all day Metro Rail project recovery"</td><td>8h &middot; Metro Rail &middot; Project Recovery</td></tr>
         <tr><td>"half hour call with Acme"</td><td>0.5h &middot; Acme Construction</td></tr>
         <tr><td>"2 and a half hours plus 85km mileage"</td><td>2.5h &middot; 85km mileage</td></tr>
-        <tr><td>"3 hours reviewing tender docs"</td><td>3h &middot; description: reviewing tender docs</td></tr>
+        <tr><td>"sixty hours Parnell Systems"</td><td>60h &middot; ParnellSystems</td></tr>
+        <tr><td>"a hundred and sixty hours total"</td><td>160h (full month)</td></tr>
+        <tr><td>"forty five hours site work"</td><td>45h &middot; description: site work</td></tr>
       </tbody>
     </table>
     <div class="tip">
       <span class="tip-icon">&#128161;</span>
-      <span class="tip-text">The parser uses <strong>fuzzy matching</strong> to find clients and projects even with slight variations in what you say. It recognises "all day" (8h), "half hour" (0.5h), and "X and a half hours" patterns.</span>
+      <span class="tip-text"><strong>Smart fuzzy matching:</strong> The parser uses <strong>Levenshtein distance</strong> (edit distance) to match client and project names even with spelling variations, typos, or speech-to-text quirks. "Tessie" matches "Tess", "Akme" matches "Acme", and PascalCase names like "TessTantrums" are automatically split into separate words for matching.</span>
+    </div>
+    <div class="tip">
+      <span class="tip-icon">&#128290;</span>
+      <span class="tip-text"><strong>Word-form numbers:</strong> PiTime understands spoken numbers from <strong>one</strong> to <strong>three hundred and twenty</strong> — including compounds like "forty five" and "a hundred and sixty". Digit form (60, 160) also works.</span>
     </div>
     <div class="tip">
       <span class="tip-icon">&#128736;</span>
@@ -390,15 +397,22 @@
     <table class="ref-table">
       <thead><tr><th>Action</th><th>How</th></tr></thead>
       <tbody>
-        <tr><td>Add client</td><td>Clients page &rarr; name, contact, email, phone, ABN, rate type, rate</td></tr>
-        <tr><td>Set rate type</td><td>Choose <strong>Hourly</strong> (e.g. $250/hr) or <strong>Daily</strong> (e.g. $1,800/day)</td></tr>
-        <tr><td>Add project</td><td>Client detail &rarr; Add Project &rarr; name, description</td></tr>
-        <tr><td>Edit client</td><td>Click client in list &rarr; modify fields &rarr; save</td></tr>
+        <tr><td>Add client</td><td>Clients page &rarr; <strong>Add Client</strong> button &rarr; fill name, contact name, email, phone, rate type, rate &rarr; Save</td></tr>
+        <tr><td>Set rate type</td><td>Choose <strong>Hourly</strong> (e.g. $250/hr) or <strong>Daily</strong> (e.g. $1,800/day) when creating or editing a client</td></tr>
+        <tr><td>Edit client</td><td>Click the <strong>pencil icon</strong> on any client card &rarr; modify name, contact details, rate &rarr; Save Changes</td></tr>
+        <tr><td>Delete client</td><td>Click the <strong>trash icon</strong> on a client card &rarr; confirm deletion. <strong>Cannot delete</strong> a client that has time entries — you must delete the entries first.</td></tr>
+        <tr><td>View projects</td><td>Click any client card to <strong>expand</strong> it &rarr; shows projects list with status badges</td></tr>
+        <tr><td>Add project</td><td>Expand a client &rarr; click <strong>Add Project</strong> &rarr; enter project name and optional code &rarr; Add</td></tr>
+        <tr><td>View contact info</td><td>Expand a client card &rarr; email and phone shown below the card header</td></tr>
       </tbody>
     </table>
     <div class="tip">
       <span class="tip-icon">&#128176;</span>
       <span class="tip-text"><strong>Daily rate invoicing:</strong> When a client is set to daily rate, PiTime converts logged hours to days using your Standard Day Hours setting (Settings &rarr; Invoice Settings). 8 hours = 1 day, 4 hours = 0.5 day.</span>
+    </div>
+    <div class="tip">
+      <span class="tip-icon">&#128274;</span>
+      <span class="tip-text"><strong>Delete protection:</strong> Clients with time entries logged against their projects are protected from deletion. This prevents accidental loss of billing data. Delete the entries first if you need to remove the client.</span>
     </div>
   </div>
 
@@ -474,8 +488,12 @@
       </div>
     </div>
     <p style="font-size:13px;color:var(--text2);margin-bottom:16px">
-      Charts for utilisation rate, revenue by client, and aged receivables will be added in Phase 5 using Recharts.
+      The dashboard also shows your <strong>5 most recent time entries</strong> from the current week, and a <strong>Quick Time Entry</strong> card that takes you straight to the voice entry form with one click.
     </p>
+    <div class="tip">
+      <span class="tip-icon">&#9889;</span>
+      <span class="tip-text"><strong>Quick entry:</strong> Click the <strong>New Entry</strong> button on the dashboard Quick Time Entry card — it opens the Time Entries page with the entry form already open and the voice input field focused, ready for dictation.</span>
+    </div>
   </div>
 
   <!-- ── 9. SETTINGS ── -->
@@ -506,7 +524,30 @@
     </div>
   </div>
 
-  <!-- ── 10. TIPS ── -->
+  <!-- ── 10. KEYBOARD SHORTCUTS ── -->
+  <div class="section" id="shortcuts">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--blue-bg);border:1px solid var(--blue-border)">&#x2328;</div>
+      <div><h2>Keyboard Shortcuts</h2><div class="section-sub">Speed up your workflow</div></div>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">
+      PiTime has keyboard shortcuts for common actions. Press <strong>?</strong> anywhere in the app to see the shortcuts panel, or click the keyboard icon in the top header bar.
+    </p>
+    <table class="ref-table">
+      <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Ctrl+N</strong> / <strong>Cmd+N</strong></td><td>New time entry — opens the entries page with the voice input field focused</td></tr>
+        <tr><td><strong>?</strong></td><td>Toggle keyboard shortcuts help panel</td></tr>
+        <tr><td><strong>Esc</strong></td><td>Close any open modal or help panel</td></tr>
+      </tbody>
+    </table>
+    <div class="tip">
+      <span class="tip-icon">&#128161;</span>
+      <span class="tip-text"><strong>Ctrl+N works from any page.</strong> Whether you're on the dashboard, clients, invoices, or settings — Ctrl+N always takes you straight to a new time entry with the voice field ready for input.</span>
+    </div>
+  </div>
+
+  <!-- ── 11. TIPS ── -->
   <div class="section" id="tips">
     <div class="section-header">
       <div class="section-icon" style="background:var(--teal-bg);border:1px solid var(--teal-border)">&#x1F4A1;</div>

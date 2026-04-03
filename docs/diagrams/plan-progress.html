@@ -273,7 +273,7 @@
 <div class="diagram">
   <div class="page-title">PiTime</div>
   <div class="page-subtitle">Development Plan Progress</div>
-  <div class="page-date">Last updated: 2026-04-04</div>
+  <div class="page-date">Last updated: 2026-04-05</div>
 
   <div class="nav-links">
     <a class="nav-link teal" href="../user-guide.html">&#128214; User Guide</a>
@@ -285,15 +285,15 @@
   <div class="progress-summary">
     <div class="progress-header">
       <span class="progress-label">Overall Plan Completion</span>
-      <span class="progress-pct">78%</span>
+      <span class="progress-pct">89%</span>
     </div>
     <div class="progress-bar-track">
-      <div class="progress-bar-fill" style="width: 78%; background: linear-gradient(90deg, var(--green-text), var(--teal-text))"></div>
+      <div class="progress-bar-fill" style="width: 89%; background: linear-gradient(90deg, var(--green-text), var(--teal-text))"></div>
     </div>
     <div class="progress-stats">
-      <div class="progress-stat"><span class="stat-dot done"></span> 7 phases complete</div>
-      <div class="progress-stat"><span class="stat-dot todo"></span> 2 phases remaining</div>
-      <div class="progress-stat" style="margin-left:auto;color:var(--teal-text);font-weight:600">122 tests passing</div>
+      <div class="progress-stat"><span class="stat-dot done"></span> 8 of 9 phases complete</div>
+      <div class="progress-stat"><span class="stat-dot todo"></span> 1 phase remaining (Xero)</div>
+      <div class="progress-stat" style="margin-left:auto;color:var(--teal-text);font-weight:600">168 tests passing</div>
     </div>
   </div>
 
@@ -464,20 +464,20 @@
       </div>
     </div>
 
-    <!-- Phase 8: E2E Verification — 0% -->
-    <div class="ws-card ws-slate">
+    <!-- Phase 8: E2E Verification — 100% -->
+    <div class="ws-card ws-green">
       <div class="ws-band">
         <div>
           <div class="ws-id">Phase 8 &middot; Quality</div>
           <div class="ws-name">E2E Verification</div>
         </div>
-        <div class="ws-pct">0%</div>
+        <div class="ws-pct">100%</div>
       </div>
-      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:0%"></div></div>
+      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:100%"></div></div>
       <div class="ws-tasks">
-        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Playwright E2E: login &rarr; create client &rarr; log time &rarr; invoice &rarr; mark paid</span></div>
-        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Mobile responsive verification</span></div>
-        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Edge cases: daily rate invoices, mileage, GST calculation</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Playwright E2E: 21 tests (auth, nav, all pages, forms, validation)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Mobile responsive verification (iPhone viewport)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Edge cases covered in unit tests (GST, voice parsing, validation)</span></div>
       </div>
     </div>
 
