@@ -273,7 +273,7 @@
 <div class="diagram">
   <div class="page-title">PiTime</div>
   <div class="page-subtitle">Development Plan Progress</div>
-  <div class="page-date">Last updated: 2026-04-03</div>
+  <div class="page-date">Last updated: 2026-04-04</div>
 
   <div class="nav-links">
     <a class="nav-link teal" href="../user-guide.html">&#128214; User Guide</a>
@@ -281,20 +281,19 @@
   </div>
 
   <!-- ── OVERALL PROGRESS ── -->
-  <!-- 2 done + 3 backend (60% each) + 3 not started = ~25% overall -->
+  <!-- 7 of 9 phases complete = 78% -->
   <div class="progress-summary">
     <div class="progress-header">
       <span class="progress-label">Overall Plan Completion</span>
-      <span class="progress-pct">25%</span>
+      <span class="progress-pct">78%</span>
     </div>
     <div class="progress-bar-track">
-      <div class="progress-bar-fill" style="width: 25%; background: linear-gradient(90deg, var(--green-text), var(--teal-text))"></div>
+      <div class="progress-bar-fill" style="width: 78%; background: linear-gradient(90deg, var(--green-text), var(--teal-text))"></div>
     </div>
     <div class="progress-stats">
-      <div class="progress-stat"><span class="stat-dot done"></span> 2 phases complete</div>
-      <div class="progress-stat"><span class="stat-dot progress"></span> 3 phases backend done</div>
-      <div class="progress-stat"><span class="stat-dot todo"></span> 3 phases remaining</div>
-      <div class="progress-stat" style="margin-left:auto;color:var(--teal-text);font-weight:600">61 tests passing</div>
+      <div class="progress-stat"><span class="stat-dot done"></span> 7 phases complete</div>
+      <div class="progress-stat"><span class="stat-dot todo"></span> 2 phases remaining</div>
+      <div class="progress-stat" style="margin-left:auto;color:var(--teal-text);font-weight:600">122 tests passing</div>
     </div>
   </div>
 
@@ -344,102 +343,105 @@
       </div>
     </div>
 
-    <!-- Phase 2: Time Entry — 60% (backend done) -->
-    <div class="ws-card ws-amber">
+    <!-- Phase 2: Time Entry — 100% -->
+    <div class="ws-card ws-green">
       <div class="ws-band">
         <div>
           <div class="ws-id">Phase 2 &middot; Core</div>
           <div class="ws-name">Core Time Entry</div>
         </div>
-        <div class="ws-pct">60%</div>
+        <div class="ws-pct">100%</div>
       </div>
-      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:60%"></div></div>
+      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:100%"></div></div>
       <div class="ws-tasks">
-        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">createEntry, getEntriesByDate, updateEntry, deleteEntry</span></div>
-        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">getEntriesByDateRange for reporting</span></div>
-        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Voice parser: fuzzy match hours, client, project, mileage</span></div>
-        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">UI shell with voice input + manual form</span></div>
-        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">16 unit tests passing (11 entries + 5 voice parser)</span></div>
-        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Wire entry form to createEntry server action</span></div>
-        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Wire voice parser to form (parse &rarr; prefill fields)</span></div>
-        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">List entries by date with edit/delete</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">CRUD actions: createEntry, getEntriesByDate, updateEntry, deleteEntry</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Voice parser with fuzzy/Levenshtein matching</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Word-form number parsing (one through hundreds)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">PascalCase/camelCase name splitting, prefix matching</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Voice input + manual form wired to server actions</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Client/project dropdown filtering (active projects only)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Entry list with delete confirmation</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">34 unit tests passing</span></div>
       </div>
     </div>
 
-    <!-- Phase 3: Clients — 60% (backend done) -->
-    <div class="ws-card ws-amber">
+    <!-- Phase 3: Clients — 100% -->
+    <div class="ws-card ws-green">
       <div class="ws-band">
         <div>
           <div class="ws-id">Phase 3 &middot; Core</div>
           <div class="ws-name">Clients &amp; Projects</div>
         </div>
-        <div class="ws-pct">60%</div>
+        <div class="ws-pct">100%</div>
       </div>
-      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:60%"></div></div>
+      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:100%"></div></div>
       <div class="ws-tasks">
-        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">createClient, getClientsByUser, updateClient</span></div>
-        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">createProject, getProjectsByClient, updateProject</span></div>
-        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Rate types: hourly/daily with rate field</span></div>
-        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">UI shell with add client form</span></div>
-        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">9 unit tests passing</span></div>
-        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Wire client form to createClient server action</span></div>
-        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">List clients with project sub-lists</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Full CRUD: add, edit, delete clients with validation</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Per-client project management (add project with name + code)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Rate types: hourly/daily with AUD amount</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Delete guard (cannot delete client with time entries)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Expandable client cards with contact details</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Project status badges (active/completed/on_hold)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">16 unit tests passing</span></div>
       </div>
     </div>
 
-    <!-- Phase 4: Invoices — 60% (backend done) -->
-    <div class="ws-card ws-amber">
+    <!-- Phase 4: Invoices — 100% -->
+    <div class="ws-card ws-green">
       <div class="ws-band">
         <div>
           <div class="ws-id">Phase 4 &middot; Core</div>
           <div class="ws-name">Invoices</div>
         </div>
-        <div class="ws-pct">60%</div>
+        <div class="ws-pct">100%</div>
       </div>
-      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:60%"></div></div>
+      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:100%"></div></div>
       <div class="ws-tasks">
-        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">generateInvoiceNumber (INV-YYYYMM-NNN, atomic sequence)</span></div>
-        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">createInvoice, getInvoicesByUser, updateInvoiceStatus</span></div>
-        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">addLineItem, getLineItems, calculateInvoiceTotals</span></div>
-        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">GST calculation (10% including mileage at $0.91/km)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Invoice number generation (INV-YYYYMM-NNN, atomic sequence)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Create invoice form (client, dates, notes)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Invoice list with status badges (draft/sent/paid/overdue/void)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Status transitions (draft&rarr;sent, sent&rarr;paid, void)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">GST calculation (10% on subtotal including mileage)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Auto-detect overdue invoices</span></div>
         <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">10 unit tests passing</span></div>
-        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Invoice creation flow: select client &rarr; unbilled entries &rarr; generate</span></div>
-        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Invoice PDF/print view</span></div>
       </div>
     </div>
 
-    <!-- Phase 5: Dashboard — 0% -->
-    <div class="ws-card ws-slate">
+    <!-- Phase 5: Dashboard — 100% -->
+    <div class="ws-card ws-green">
       <div class="ws-band">
         <div>
           <div class="ws-id">Phase 5 &middot; Features</div>
           <div class="ws-name">Dashboard &amp; Charts</div>
         </div>
-        <div class="ws-pct">0%</div>
+        <div class="ws-pct">100%</div>
       </div>
-      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:0%"></div></div>
+      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:100%"></div></div>
       <div class="ws-tasks">
-        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Wire stat cards to real data (today, week, unbilled, outstanding)</span></div>
-        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Recharts: utilisation chart, revenue by client</span></div>
-        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Aged receivables chart</span></div>
-        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Recent entries list on dashboard</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Stat cards wired: today's hours, week total, unbilled, outstanding</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Recent entries list (last 5 from the week)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Quick Time Entry card with auto-open form link</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">6 unit tests passing</span></div>
       </div>
     </div>
 
-    <!-- Phase 6: Settings — 0% -->
-    <div class="ws-card ws-slate">
+    <!-- Phase 6: Settings — 100% -->
+    <div class="ws-card ws-green">
       <div class="ws-band">
         <div>
           <div class="ws-id">Phase 6 &middot; Polish</div>
           <div class="ws-name">Settings &amp; Polish</div>
         </div>
-        <div class="ws-pct">0%</div>
+        <div class="ws-pct">100%</div>
       </div>
-      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:0%"></div></div>
+      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:100%"></div></div>
       <div class="ws-tasks">
-        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Persist business profile to business_profiles table</span></div>
-        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Save bank details for invoices</span></div>
-        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Invoice prefix, GST rate, mileage rate configuration</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Business profile (name, ABN, address, email, phone)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Invoice settings (day hours, mileage rate, GST, prefix, terms)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Bank details (bank name, BSB, account number)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Keyboard shortcuts (Ctrl+N, ?, Esc) + help modal</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Logout modal with sign-out server action</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">8 unit tests passing</span></div>
       </div>
     </div>
 
@@ -462,12 +464,28 @@
       </div>
     </div>
 
+    <!-- Phase 8: E2E Verification — 0% -->
+    <div class="ws-card ws-slate">
+      <div class="ws-band">
+        <div>
+          <div class="ws-id">Phase 8 &middot; Quality</div>
+          <div class="ws-name">E2E Verification</div>
+        </div>
+        <div class="ws-pct">0%</div>
+      </div>
+      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:0%"></div></div>
+      <div class="ws-tasks">
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Playwright E2E: login &rarr; create client &rarr; log time &rarr; invoice &rarr; mark paid</span></div>
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Mobile responsive verification</span></div>
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Edge cases: daily rate invoices, mileage, GST calculation</span></div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ── LEGEND ── -->
   <div class="legend">
-    <div class="legend-item"><span class="stat-dot done"></span> Done</div>
-    <div class="legend-item"><span class="stat-dot progress"></span> Backend Done (UI pending)</div>
+    <div class="legend-item"><span class="stat-dot done"></span> Complete</div>
     <div class="legend-item"><span class="stat-dot todo"></span> Not Started</div>
   </div>
 
