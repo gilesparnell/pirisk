@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PiTime — User Guide</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --surface: #151821; --surface2: #1a1f2e;
+    --border: #1e293b; --border2: #2d3748;
+    --text1: #e2e8f0; --text2: #94a3b8; --text3: #475569;
+    --mono: 'SF Mono', Menlo, monospace;
+    --green: #34d399; --green-bg: #0a1f14; --green-border: #059669;
+    --amber: #fbbf24; --amber-bg: #1a1208; --amber-border: #d97706;
+    --blue: #60a5fa; --blue-bg: #0f1a2e; --blue-border: #3b82f6;
+    --purple: #a78bfa; --purple-bg: #1a1035; --purple-border: #6d28d9;
+    --teal: #2dd4bf; --teal-bg: #051a18; --teal-border: #0d9488;
+    --rose: #fb7185; --rose-bg: #1a0808; --rose-border: #e11d48;
+    --coral: #fb923c; --coral-bg: #1a0f08; --coral-border: #ea580c;
+    --slate: #9ca3af; --slate-bg: #111827; --slate-border: #374151;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg); color: var(--text1);
+    min-height: 100vh; padding: 40px 24px 80px;
+    line-height: 1.6;
+  }
+  .guide { max-width: 900px; margin: 0 auto; }
+
+  /* Header */
+  .guide-header { text-align: center; margin-bottom: 48px; }
+  .guide-header h1 {
+    font-size: 28px; font-weight: 700; color: var(--text1);
+    margin-bottom: 8px; letter-spacing: -0.02em;
+  }
+  .guide-header p { font-size: 14px; color: var(--text3); }
+  .guide-header .version {
+    display: inline-block; font-size: 10px; font-family: var(--mono);
+    color: var(--teal); background: var(--teal-bg); border: 1px solid var(--teal-border);
+    padding: 2px 8px; border-radius: 4px; margin-top: 12px;
+  }
+  .nav-links {
+    display: flex; gap: 12px; justify-content: center;
+    margin-top: 16px; flex-wrap: wrap;
+  }
+  .nav-link {
+    font-size: 12px; font-weight: 600; padding: 6px 16px;
+    border-radius: 6px; text-decoration: none; transition: opacity 0.2s;
+  }
+  .nav-link:hover { opacity: 0.8; }
+  .nav-link.green { color: var(--green); background: var(--green-bg); border: 1px solid var(--green-border); }
+  .nav-link.purple { color: var(--purple); background: var(--purple-bg); border: 1px solid var(--purple-border); }
+
+  /* TOC */
+  .toc {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px 28px; margin-bottom: 40px;
+  }
+  .toc-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; }
+  .toc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+  .toc-item {
+    font-size: 13px; color: var(--blue); text-decoration: none;
+    display: flex; align-items: center; gap: 8px; padding: 4px 0;
+  }
+  .toc-item:hover { color: var(--text1); }
+  .toc-num { font-family: var(--mono); font-size: 10px; color: var(--text3); min-width: 20px; }
+
+  /* Sections */
+  .section { margin-bottom: 48px; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
+  }
+  .section-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .section-header h2 { font-size: 18px; font-weight: 700; color: var(--text1); }
+  .section-header .section-sub { font-size: 12px; color: var(--text3); }
+
+  /* Concept cards */
+  .concept-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .concept-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px; position: relative; overflow: hidden;
+  }
+  .concept-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .concept-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .concept-card p { font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .concept-card .badge {
+    display: inline-block; font-size: 9px; font-weight: 700; font-family: var(--mono);
+    padding: 2px 6px; border-radius: 3px; margin-top: 10px; letter-spacing: 0.05em;
+  }
+
+  .card-purple::before { background: var(--purple); } .card-purple h3 { color: var(--purple); }
+  .card-blue::before { background: var(--blue); } .card-blue h3 { color: var(--blue); }
+  .card-green::before { background: var(--green); } .card-green h3 { color: var(--green); }
+  .card-amber::before { background: var(--amber); } .card-amber h3 { color: var(--amber); }
+  .card-teal::before { background: var(--teal); } .card-teal h3 { color: var(--teal); }
+  .card-coral::before { background: var(--coral); } .card-coral h3 { color: var(--coral); }
+
+  /* Flow diagrams */
+  .flow {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px; margin-bottom: 24px;
+  }
+  .flow-title {
+    font-size: 11px; font-weight: 700; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;
+  }
+  .flow-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 0; }
+  .flow-step {
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: 8px; padding: 10px 16px; position: relative;
+  }
+  .flow-step .step-num {
+    font-size: 9px; font-family: var(--mono); color: var(--text3);
+    margin-bottom: 2px;
+  }
+  .flow-step .step-text { font-size: 12px; color: var(--text2); }
+  .flow-step .step-detail { font-size: 10px; color: var(--text3); margin-top: 2px; }
+  .flow-arrow {
+    color: var(--text3); font-size: 16px; padding: 0 8px; flex-shrink: 0;
+  }
+
+  /* Tips */
+  .tip {
+    background: var(--teal-bg); border: 1px solid var(--teal-border);
+    border-radius: 10px; padding: 16px 20px; margin-bottom: 16px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .tip-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .tip-text { font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .tip-text strong { color: var(--teal); }
+
+  /* Quick ref table */
+  .ref-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  .ref-table th {
+    text-align: left; font-size: 10px; font-weight: 700; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 8px 12px; border-bottom: 2px solid var(--border);
+  }
+  .ref-table td {
+    font-size: 12px; color: var(--text2); padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .ref-table td:first-child { font-weight: 600; color: var(--text1); }
+
+  /* Hierarchy */
+  .hierarchy {
+    font-family: var(--mono); font-size: 12px; color: var(--text2);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 24px; margin-bottom: 24px;
+    line-height: 2;
+  }
+  .h-client { color: var(--purple); font-weight: 700; }
+  .h-project { color: var(--blue); }
+  .h-entry { color: var(--amber); }
+  .h-invoice { color: var(--green); }
+  .h-dim { color: var(--text3); }
+  .h-indent { padding-left: 24px; display: block; }
+  .h-indent2 { padding-left: 48px; display: block; }
+
+  /* Feature list */
+  .feature-list { list-style: none; padding: 0; }
+  .feature-list li {
+    font-size: 12px; color: var(--text2); padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .feature-list li:last-child { border-bottom: none; }
+  .feature-list .feat-icon { font-size: 12px; flex-shrink: 0; margin-top: 2px; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .flow-steps { flex-direction: column; gap: 0; }
+    .flow-arrow { transform: rotate(90deg); padding: 4px 0; }
+    .concept-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="guide">
+
+  <!-- ── HEADER ── -->
+  <div class="guide-header">
+    <h1>PiTime</h1>
+    <p>Voice-activated timesheet and invoice app for PiRisk Management.</p>
+    <span class="version">v0.1 &middot; User Guide</span>
+    <div class="nav-links">
+      <a class="nav-link green" href="diagrams/plan-progress.html">&#128200; Project Progress (25%)</a>
+      <a class="nav-link purple" href="index.html">&#128203; Project Docs</a>
+    </div>
+  </div>
+
+  <!-- ── TABLE OF CONTENTS ── -->
+  <div class="toc">
+    <div class="toc-title">In This Guide</div>
+    <div class="toc-grid">
+      <a class="toc-item" href="#overview"><span class="toc-num">01</span> Overview</a>
+      <a class="toc-item" href="#hierarchy"><span class="toc-num">02</span> Data Hierarchy</a>
+      <a class="toc-item" href="#workflow"><span class="toc-num">03</span> Typical Workflow</a>
+      <a class="toc-item" href="#voice"><span class="toc-num">04</span> Voice Entry</a>
+      <a class="toc-item" href="#entries"><span class="toc-num">05</span> Time Entries</a>
+      <a class="toc-item" href="#clients"><span class="toc-num">06</span> Clients &amp; Projects</a>
+      <a class="toc-item" href="#invoices"><span class="toc-num">07</span> Invoices</a>
+      <a class="toc-item" href="#dashboard"><span class="toc-num">08</span> Dashboard</a>
+      <a class="toc-item" href="#settings"><span class="toc-num">09</span> Settings</a>
+      <a class="toc-item" href="#tips"><span class="toc-num">10</span> Tips &amp; Tricks</a>
+    </div>
+  </div>
+
+  <!-- ── 1. OVERVIEW ── -->
+  <div class="section" id="overview">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--teal-bg);border:1px solid var(--teal-border)">&#x1F4A1;</div>
+      <div><h2>Overview</h2><div class="section-sub">What PiTime does</div></div>
+    </div>
+    <div class="concept-row">
+      <div class="concept-card card-teal">
+        <h3>Voice Time Entry</h3>
+        <p>Speak naturally to log time. PiTime uses Wispr Flow (OS-level speech-to-text) plus a local fuzzy parser to extract hours, client, project, and mileage from plain English.</p>
+        <span class="badge" style="background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border)">Core</span>
+      </div>
+      <div class="concept-card card-blue">
+        <h3>Client Management</h3>
+        <p>Track clients with hourly or daily rates. Each client can have multiple projects. Contact details, ABN, and rate configuration stored per client.</p>
+        <span class="badge" style="background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border)">Manage</span>
+      </div>
+      <div class="concept-card card-green">
+        <h3>Invoicing</h3>
+        <p>Generate invoices from unbilled time entries. Sequential numbering (INV-YYYYMM-NNN), automatic GST calculation (10%), mileage at ATO rate ($0.91/km).</p>
+        <span class="badge" style="background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)">Bill</span>
+      </div>
+    </div>
+    <div class="concept-row">
+      <div class="concept-card card-amber">
+        <h3>Dashboard</h3>
+        <p>At-a-glance view of today's hours, weekly totals, unbilled amounts, and outstanding invoices. Charts for utilisation and revenue by client.</p>
+        <span class="badge" style="background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)">Track</span>
+      </div>
+      <div class="concept-card card-purple">
+        <h3>Xero Integration</h3>
+        <p>Connect to Xero for automatic invoice syncing and payment tracking. Contacts sync, invoices push, and payment webhooks mark invoices as paid.</p>
+        <span class="badge" style="background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border)">Phase 7</span>
+      </div>
+      <div class="concept-card card-coral">
+        <h3>Settings</h3>
+        <p>Configure your business profile, bank details, invoice prefix, GST rate, mileage rate, standard day hours, and payment terms.</p>
+        <span class="badge" style="background:var(--coral-bg);color:var(--coral);border:1px solid var(--coral-border)">Configure</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. DATA HIERARCHY ── -->
+  <div class="section" id="hierarchy">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--blue-bg);border:1px solid var(--blue-border)">&#x1F3D7;</div>
+      <div><h2>Data Hierarchy</h2><div class="section-sub">How everything fits together</div></div>
+    </div>
+    <div class="hierarchy">
+      <span class="h-client">&#9632; Acme Construction</span> <span class="h-dim">(Client &mdash; daily rate $1,800)</span>
+      <span class="h-indent"><span class="h-project">&#9656; Contract Dispute</span> <span class="h-dim">(Project)</span></span>
+      <span class="h-indent2"><span class="h-entry">&#9654; 4 hours &mdash; "Reviewed tender docs"</span> <span class="h-dim">(Time Entry &mdash; 3 Apr 2026)</span></span>
+      <span class="h-indent2"><span class="h-entry">&#9654; 85 km mileage &mdash; "Site visit Parramatta"</span> <span class="h-dim">(Mileage Entry)</span></span>
+      <span class="h-indent"><span class="h-project">&#9656; Delay Claim</span> <span class="h-dim">(Project)</span></span>
+      <span class="h-indent2"><span class="h-entry">&#9654; 8 hours &mdash; "Full day on-site"</span> <span class="h-dim">(Time Entry &mdash; all day)</span></span>
+      <span class="h-indent"><span class="h-invoice">&#9632; INV-202604-001</span> <span class="h-dim">(Invoice &mdash; $5,400.00 + $540.00 GST)</span></span>
+      <br>
+      <span class="h-client">&#9632; Metro Rail Pty</span> <span class="h-dim">(Client &mdash; hourly rate $250)</span>
+      <span class="h-indent"><span class="h-project">&#9656; Project Recovery</span> <span class="h-dim">(Project)</span></span>
+    </div>
+    <div class="tip">
+      <span class="tip-icon">&#9432;</span>
+      <span class="tip-text"><strong>Rate types:</strong> Clients can be set to <strong>hourly</strong> or <strong>daily</strong> rate. Daily-rate invoices convert logged hours to days using your <strong>Standard Day Hours</strong> setting (default: 8 hours).</span>
+    </div>
+  </div>
+
+  <!-- ── 3. TYPICAL WORKFLOW ── -->
+  <div class="section" id="workflow">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--green-bg);border:1px solid var(--green-border)">&#x1F504;</div>
+      <div><h2>Typical Workflow</h2><div class="section-sub">From time logged to invoice paid</div></div>
+    </div>
+    <div class="flow">
+      <div class="flow-title">The PiTime Cycle</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="step-num">1</div>
+          <div class="step-text" style="color:var(--teal)">Speak or type time</div>
+          <div class="step-detail">Voice or manual entry</div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step">
+          <div class="step-num">2</div>
+          <div class="step-text" style="color:var(--blue)">Parser fills fields</div>
+          <div class="step-detail">Hours, client, project, mileage</div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step">
+          <div class="step-num">3</div>
+          <div class="step-text" style="color:var(--amber)">Review &amp; save</div>
+          <div class="step-detail">Confirm or adjust details</div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step">
+          <div class="step-num">4</div>
+          <div class="step-text" style="color:var(--green)">Generate invoice</div>
+          <div class="step-detail">Select unbilled entries</div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step">
+          <div class="step-num">5</div>
+          <div class="step-text" style="color:var(--purple)">Push to Xero</div>
+          <div class="step-detail">Auto-sync (Phase 7)</div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step">
+          <div class="step-num">6</div>
+          <div class="step-text" style="color:var(--coral)">Payment received</div>
+          <div class="step-detail">Webhook marks paid</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4. VOICE ENTRY ── -->
+  <div class="section" id="voice">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--teal-bg);border:1px solid var(--teal-border)">&#x1F3A4;</div>
+      <div><h2>Voice Entry</h2><div class="section-sub">Speak naturally to log time</div></div>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">
+      PiTime uses <strong>Wispr Flow</strong> (OS-level speech-to-text) which types spoken words directly into the browser. A local fuzzy parser then extracts structured data from the natural language text.
+    </p>
+    <table class="ref-table">
+      <thead><tr><th>You Say</th><th>PiTime Extracts</th></tr></thead>
+      <tbody>
+        <tr><td>"4 hours on Acme contract dispute"</td><td>4h &middot; Acme Construction &middot; Contract Dispute</td></tr>
+        <tr><td>"all day Metro Rail project recovery"</td><td>8h &middot; Metro Rail &middot; Project Recovery</td></tr>
+        <tr><td>"half hour call with Acme"</td><td>0.5h &middot; Acme Construction</td></tr>
+        <tr><td>"2 and a half hours plus 85km mileage"</td><td>2.5h &middot; 85km mileage</td></tr>
+        <tr><td>"3 hours reviewing tender docs"</td><td>3h &middot; description: reviewing tender docs</td></tr>
+      </tbody>
+    </table>
+    <div class="tip">
+      <span class="tip-icon">&#128161;</span>
+      <span class="tip-text">The parser uses <strong>fuzzy matching</strong> to find clients and projects even with slight variations in what you say. It recognises "all day" (8h), "half hour" (0.5h), and "X and a half hours" patterns.</span>
+    </div>
+    <div class="tip">
+      <span class="tip-icon">&#128736;</span>
+      <span class="tip-text"><strong>Mileage tracking:</strong> Say "plus 85 km mileage" or "85 kilometres" and PiTime will add a mileage line item at the ATO rate ($0.91/km for 2025-26). This appears as a separate line on invoices.</span>
+    </div>
+  </div>
+
+  <!-- ── 5. TIME ENTRIES ── -->
+  <div class="section" id="entries">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--amber-bg);border:1px solid var(--amber-border)">&#x23F1;</div>
+      <div><h2>Time Entries</h2><div class="section-sub">Log and manage your time</div></div>
+    </div>
+    <table class="ref-table">
+      <thead><tr><th>Action</th><th>How</th></tr></thead>
+      <tbody>
+        <tr><td>Log via voice</td><td>Time Entries page &rarr; speak into voice input field &rarr; review &rarr; save</td></tr>
+        <tr><td>Log manually</td><td>Time Entries page &rarr; fill date, client, project, hours, description</td></tr>
+        <tr><td>Add mileage</td><td>Enter km in the mileage field (invoiced at $0.91/km)</td></tr>
+        <tr><td>Mark non-billable</td><td>Uncheck the "Billable" toggle (won't appear on invoices)</td></tr>
+        <tr><td>Edit entry</td><td>Click entry in list &rarr; modify fields &rarr; save</td></tr>
+        <tr><td>Delete entry</td><td>Click entry &rarr; delete button (only unbilled entries)</td></tr>
+      </tbody>
+    </table>
+    <div class="tip">
+      <span class="tip-icon">&#9889;</span>
+      <span class="tip-text"><strong>Entry types:</strong> Each entry is tagged as <strong>voice</strong>, <strong>manual</strong>, or <strong>timer</strong> to track how you prefer to log time.</span>
+    </div>
+  </div>
+
+  <!-- ── 6. CLIENTS & PROJECTS ── -->
+  <div class="section" id="clients">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--blue-bg);border:1px solid var(--blue-border)">&#x1F465;</div>
+      <div><h2>Clients &amp; Projects</h2><div class="section-sub">Organise your work</div></div>
+    </div>
+    <table class="ref-table">
+      <thead><tr><th>Action</th><th>How</th></tr></thead>
+      <tbody>
+        <tr><td>Add client</td><td>Clients page &rarr; name, contact, email, phone, ABN, rate type, rate</td></tr>
+        <tr><td>Set rate type</td><td>Choose <strong>Hourly</strong> (e.g. $250/hr) or <strong>Daily</strong> (e.g. $1,800/day)</td></tr>
+        <tr><td>Add project</td><td>Client detail &rarr; Add Project &rarr; name, description</td></tr>
+        <tr><td>Edit client</td><td>Click client in list &rarr; modify fields &rarr; save</td></tr>
+      </tbody>
+    </table>
+    <div class="tip">
+      <span class="tip-icon">&#128176;</span>
+      <span class="tip-text"><strong>Daily rate invoicing:</strong> When a client is set to daily rate, PiTime converts logged hours to days using your Standard Day Hours setting (Settings &rarr; Invoice Settings). 8 hours = 1 day, 4 hours = 0.5 day.</span>
+    </div>
+  </div>
+
+  <!-- ── 7. INVOICES ── -->
+  <div class="section" id="invoices">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--green-bg);border:1px solid var(--green-border)">&#x1F4B0;</div>
+      <div><h2>Invoices</h2><div class="section-sub">Bill your clients</div></div>
+    </div>
+    <div class="flow">
+      <div class="flow-title">Invoice Creation Flow</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="step-num">1</div>
+          <div class="step-text" style="color:var(--blue)">Select client</div>
+          <div class="step-detail">Choose who to bill</div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step">
+          <div class="step-num">2</div>
+          <div class="step-text" style="color:var(--amber)">Pick unbilled entries</div>
+          <div class="step-detail">Select date range or entries</div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step">
+          <div class="step-num">3</div>
+          <div class="step-text" style="color:var(--green)">Generate invoice</div>
+          <div class="step-detail">Auto line items + GST</div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step">
+          <div class="step-num">4</div>
+          <div class="step-text" style="color:var(--purple)">Send / Print</div>
+          <div class="step-detail">PDF or push to Xero</div>
+        </div>
+      </div>
+    </div>
+    <table class="ref-table">
+      <thead><tr><th>Detail</th><th>How It Works</th></tr></thead>
+      <tbody>
+        <tr><td>Invoice number</td><td>Auto-generated: <strong>INV-YYYYMM-NNN</strong> (e.g. INV-202604-001). Atomic counter per month ensures no gaps.</td></tr>
+        <tr><td>Line items</td><td>Each time entry becomes a line item. Mileage entries added separately at ATO rate.</td></tr>
+        <tr><td>GST</td><td>10% applied automatically to all line items including mileage.</td></tr>
+        <tr><td>Totals</td><td>Subtotal + GST = Total. Calculated from line items, not a flat amount.</td></tr>
+        <tr><td>Status</td><td><strong>Draft</strong> &rarr; <strong>Sent</strong> &rarr; <strong>Paid</strong> (or Overdue, Void)</td></tr>
+        <tr><td>Payment terms</td><td>Configurable in Settings (default: 30 days)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── 8. DASHBOARD ── -->
+  <div class="section" id="dashboard">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--amber-bg);border:1px solid var(--amber-border)">&#x1F4CA;</div>
+      <div><h2>Dashboard</h2><div class="section-sub">Your daily overview</div></div>
+    </div>
+    <div class="concept-row">
+      <div class="concept-card card-teal">
+        <h3>Today's Hours</h3>
+        <p>Total hours logged today across all clients and projects.</p>
+      </div>
+      <div class="concept-card card-blue">
+        <h3>This Week</h3>
+        <p>Running total for the current week (Mon-Sun).</p>
+      </div>
+      <div class="concept-card card-amber">
+        <h3>Unbilled</h3>
+        <p>Total value of billable time entries not yet on an invoice.</p>
+      </div>
+      <div class="concept-card card-coral">
+        <h3>Outstanding</h3>
+        <p>Total value of sent invoices awaiting payment.</p>
+      </div>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">
+      Charts for utilisation rate, revenue by client, and aged receivables will be added in Phase 5 using Recharts.
+    </p>
+  </div>
+
+  <!-- ── 9. SETTINGS ── -->
+  <div class="section" id="settings">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--slate-bg);border:1px solid var(--slate-border)">&#x2699;</div>
+      <div><h2>Settings</h2><div class="section-sub">Configure PiTime for your business</div></div>
+    </div>
+    <div class="concept-row">
+      <div class="concept-card card-teal">
+        <h3>Business Profile</h3>
+        <p>Business name, ABN, address, email, phone. Appears on invoices and correspondence.</p>
+      </div>
+      <div class="concept-card card-amber">
+        <h3>Invoice Settings</h3>
+        <p>Standard day hours (8), mileage rate ($0.91/km), payment terms (30 days), invoice prefix (INV), GST rate (10%).</p>
+      </div>
+    </div>
+    <div class="concept-row">
+      <div class="concept-card card-blue">
+        <h3>Bank Details</h3>
+        <p>Bank name, BSB, and account number. Displayed on invoices for payment reference.</p>
+      </div>
+      <div class="concept-card card-purple">
+        <h3>Xero Connection</h3>
+        <p>OAuth2 connect button. Once linked, invoices and contacts sync automatically. Coming in Phase 7.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 10. TIPS ── -->
+  <div class="section" id="tips">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--teal-bg);border:1px solid var(--teal-border)">&#x1F4A1;</div>
+      <div><h2>Tips &amp; Tricks</h2><div class="section-sub">Get the most out of PiTime</div></div>
+    </div>
+    <div class="tip">
+      <span class="tip-icon">&#127908;</span>
+      <span class="tip-text"><strong>Use Wispr Flow for hands-free entry.</strong> Enable Wispr Flow in macOS settings, then just speak into the voice input field. PiTime's parser handles the rest &mdash; no need for exact phrasing.</span>
+    </div>
+    <div class="tip">
+      <span class="tip-icon">&#128176;</span>
+      <span class="tip-text"><strong>Log mileage as you go.</strong> Add "plus 45 km" to any voice entry and PiTime creates a separate mileage line item on the invoice at the current ATO rate.</span>
+    </div>
+    <div class="tip">
+      <span class="tip-icon">&#128203;</span>
+      <span class="tip-text"><strong>Daily vs hourly rates matter.</strong> Set the right rate type per client. Daily-rate clients have their hours converted to day fractions on invoices (e.g. 4 hours = 0.5 days at $1,800/day = $900).</span>
+    </div>
+    <div class="tip">
+      <span class="tip-icon">&#128200;</span>
+      <span class="tip-text"><strong>Check unbilled regularly.</strong> The dashboard shows your unbilled total &mdash; don't let billable hours pile up. Generate invoices at least monthly.</span>
+    </div>
+    <div class="tip">
+      <span class="tip-icon">&#128736;</span>
+      <span class="tip-text"><strong>Set up your business profile first.</strong> Go to Settings and fill in your business name, ABN, and bank details before generating your first invoice.</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

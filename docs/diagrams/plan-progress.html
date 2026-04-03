@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PiTime — Plan Progress</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #0f1117;
+    --surface:    #151821;
+    --border:     #1e293b;
+    --text1:      #e2e8f0;
+    --text2:      #94a3b8;
+    --text3:      #475569;
+    --mono:       'SF Mono', Menlo, monospace;
+
+    --green-bg:     #0a1f14; --green-border:  #059669; --green-text:  #34d399;
+    --amber-bg:     #1a1208; --amber-border:  #d97706; --amber-text:  #fbbf24;
+    --blue-bg:      #0f1a2e; --blue-border:   #3b82f6; --blue-text:   #60a5fa;
+    --purple-bg:    #1a1035; --purple-border: #6d28d9; --purple-text: #a78bfa;
+    --teal-bg:      #051a18; --teal-border:   #0d9488; --teal-text:   #2dd4bf;
+    --slate-bg:     #111827; --slate-border:  #374151; --slate-text:  #9ca3af;
+    --rose-bg:      #1a0808; --rose-border:   #e11d48; --rose-text:   #fb7185;
+    --coral-bg:     #1a0f08; --coral-border:  #ea580c; --coral-text:  #fb923c;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text1);
+    min-height: 100vh;
+    padding: 40px 24px 80px;
+  }
+
+  .page-title {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .page-subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text3);
+    margin-bottom: 12px;
+  }
+  .page-date {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text3);
+    font-family: var(--mono);
+    margin-bottom: 40px;
+  }
+
+  .diagram { max-width: 1100px; margin: 0 auto; }
+
+  /* ── OVERALL PROGRESS BAR ── */
+  .progress-summary {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 36px;
+  }
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+  .progress-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+  }
+  .progress-pct {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--teal-text);
+    font-family: var(--mono);
+  }
+  .progress-bar-track {
+    width: 100%;
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.6s ease;
+  }
+  .progress-stats {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .progress-stat {
+    font-size: 11px;
+    color: var(--text3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .stat-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .stat-dot.done { background: var(--green-text); }
+  .stat-dot.progress { background: var(--amber-text); }
+  .stat-dot.todo { background: var(--slate-text); }
+
+  /* ── WORKSTREAM CARDS ── */
+  .workstreams {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+
+  .ws-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .ws-band {
+    padding: 16px 20px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .ws-id {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 2px;
+  }
+  .ws-name {
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .ws-pct {
+    font-size: 18px;
+    font-weight: 700;
+    font-family: var(--mono);
+  }
+  .ws-bar-track {
+    height: 3px;
+    background: var(--border);
+    margin: 0 20px;
+  }
+  .ws-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s;
+  }
+
+  .ws-tasks {
+    padding: 14px 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .task {
+    font-size: 11px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.4;
+  }
+  .task-icon {
+    flex-shrink: 0;
+    font-size: 12px;
+    margin-top: 1px;
+  }
+  .task-text { color: var(--text2); }
+  .task.done .task-text { color: var(--green-text); text-decoration: line-through; opacity: 0.7; }
+  .task.progress .task-text { color: var(--amber-text); }
+
+  /* Colour variants */
+  .ws-green  { border-color: var(--green-border); }
+  .ws-green .ws-band { background: var(--green-bg); }
+  .ws-green .ws-id, .ws-green .ws-name, .ws-green .ws-pct { color: var(--green-text); }
+  .ws-green .ws-bar-fill { background: var(--green-text); }
+
+  .ws-amber  { border-color: var(--amber-border); }
+  .ws-amber .ws-band { background: var(--amber-bg); }
+  .ws-amber .ws-id, .ws-amber .ws-name, .ws-amber .ws-pct { color: var(--amber-text); }
+  .ws-amber .ws-bar-fill { background: var(--amber-text); }
+
+  .ws-teal   { border-color: var(--teal-border); }
+  .ws-teal .ws-band { background: var(--teal-bg); }
+  .ws-teal .ws-id, .ws-teal .ws-name, .ws-teal .ws-pct { color: var(--teal-text); }
+  .ws-teal .ws-bar-fill { background: var(--teal-text); }
+
+  .ws-slate  { border-color: var(--slate-border); }
+  .ws-slate .ws-band { background: var(--slate-bg); }
+  .ws-slate .ws-id, .ws-slate .ws-name, .ws-slate .ws-pct { color: var(--slate-text); }
+  .ws-slate .ws-bar-fill { background: var(--slate-text); }
+
+  .ws-blue   { border-color: var(--blue-border); }
+  .ws-blue .ws-band { background: var(--blue-bg); }
+  .ws-blue .ws-id, .ws-blue .ws-name, .ws-blue .ws-pct { color: var(--blue-text); }
+  .ws-blue .ws-bar-fill { background: var(--blue-text); }
+
+  .ws-purple { border-color: var(--purple-border); }
+  .ws-purple .ws-band { background: var(--purple-bg); }
+  .ws-purple .ws-id, .ws-purple .ws-name, .ws-purple .ws-pct { color: var(--purple-text); }
+  .ws-purple .ws-bar-fill { background: var(--purple-text); }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    font-size: 11px;
+    color: var(--text3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ── NAV LINKS ── */
+  .nav-links {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+  .nav-link {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--blue-text);
+    background: var(--blue-bg);
+    border: 1px solid var(--blue-border);
+    padding: 6px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .nav-link:hover { opacity: 0.8; }
+  .nav-link.teal {
+    color: var(--teal-text);
+    background: var(--teal-bg);
+    border-color: var(--teal-border);
+  }
+  .nav-link.purple {
+    color: var(--purple-text);
+    background: var(--purple-bg);
+    border-color: var(--purple-border);
+  }
+</style>
+</head>
+<body>
+
+<div class="diagram">
+  <div class="page-title">PiTime</div>
+  <div class="page-subtitle">Development Plan Progress</div>
+  <div class="page-date">Last updated: 2026-04-03</div>
+
+  <div class="nav-links">
+    <a class="nav-link teal" href="../user-guide.html">&#128214; User Guide</a>
+    <a class="nav-link" href="../index.html">&#128203; Project Docs</a>
+  </div>
+
+  <!-- ── OVERALL PROGRESS ── -->
+  <!-- 2 done + 3 backend (60% each) + 3 not started = ~25% overall -->
+  <div class="progress-summary">
+    <div class="progress-header">
+      <span class="progress-label">Overall Plan Completion</span>
+      <span class="progress-pct">25%</span>
+    </div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" style="width: 25%; background: linear-gradient(90deg, var(--green-text), var(--teal-text))"></div>
+    </div>
+    <div class="progress-stats">
+      <div class="progress-stat"><span class="stat-dot done"></span> 2 phases complete</div>
+      <div class="progress-stat"><span class="stat-dot progress"></span> 3 phases backend done</div>
+      <div class="progress-stat"><span class="stat-dot todo"></span> 3 phases remaining</div>
+      <div class="progress-stat" style="margin-left:auto;color:var(--teal-text);font-weight:600">61 tests passing</div>
+    </div>
+  </div>
+
+  <!-- ── WORKSTREAM CARDS ── -->
+  <div class="workstreams">
+
+    <!-- Phase 0: Migration — 100% -->
+    <div class="ws-card ws-green">
+      <div class="ws-band">
+        <div>
+          <div class="ws-id">Phase 0 &middot; Foundation</div>
+          <div class="ws-name">Netlify &rarr; Vercel Migration</div>
+        </div>
+        <div class="ws-pct">100%</div>
+      </div>
+      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:100%"></div></div>
+      <div class="ws-tasks">
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Next.js 15 scaffold with Turbo, Tailwind CSS 4</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Hero section with gradient text</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">6 service cards (Distressed Project Turnaround, etc.)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">About section with stats (20+ years, $67M+ recovered)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Contact section with form, phone, email, Grace AI</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Responsive navbar with PiTime link</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Footer with brand and navigation</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">14 unit tests passing</span></div>
+      </div>
+    </div>
+
+    <!-- Phase 1: Auth + DB — 100% -->
+    <div class="ws-card ws-green">
+      <div class="ws-band">
+        <div>
+          <div class="ws-id">Phase 1 &middot; Foundation</div>
+          <div class="ws-name">Auth + DB Foundation</div>
+        </div>
+        <div class="ws-pct">100%</div>
+      </div>
+      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:100%"></div></div>
+      <div class="ws-tasks">
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Turso database created (Mumbai region)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Full Drizzle schema deployed (10 tables)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Google OAuth via NextAuth v5 (JWT sessions, 24h)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Email allowlist access control</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Route protection middleware (/app/* requires auth)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Dev login for local testing</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">12 unit tests passing</span></div>
+      </div>
+    </div>
+
+    <!-- Phase 2: Time Entry — 60% (backend done) -->
+    <div class="ws-card ws-amber">
+      <div class="ws-band">
+        <div>
+          <div class="ws-id">Phase 2 &middot; Core</div>
+          <div class="ws-name">Core Time Entry</div>
+        </div>
+        <div class="ws-pct">60%</div>
+      </div>
+      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:60%"></div></div>
+      <div class="ws-tasks">
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">createEntry, getEntriesByDate, updateEntry, deleteEntry</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">getEntriesByDateRange for reporting</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Voice parser: fuzzy match hours, client, project, mileage</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">UI shell with voice input + manual form</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">16 unit tests passing (11 entries + 5 voice parser)</span></div>
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Wire entry form to createEntry server action</span></div>
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Wire voice parser to form (parse &rarr; prefill fields)</span></div>
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">List entries by date with edit/delete</span></div>
+      </div>
+    </div>
+
+    <!-- Phase 3: Clients — 60% (backend done) -->
+    <div class="ws-card ws-amber">
+      <div class="ws-band">
+        <div>
+          <div class="ws-id">Phase 3 &middot; Core</div>
+          <div class="ws-name">Clients &amp; Projects</div>
+        </div>
+        <div class="ws-pct">60%</div>
+      </div>
+      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:60%"></div></div>
+      <div class="ws-tasks">
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">createClient, getClientsByUser, updateClient</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">createProject, getProjectsByClient, updateProject</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">Rate types: hourly/daily with rate field</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">UI shell with add client form</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">9 unit tests passing</span></div>
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Wire client form to createClient server action</span></div>
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">List clients with project sub-lists</span></div>
+      </div>
+    </div>
+
+    <!-- Phase 4: Invoices — 60% (backend done) -->
+    <div class="ws-card ws-amber">
+      <div class="ws-band">
+        <div>
+          <div class="ws-id">Phase 4 &middot; Core</div>
+          <div class="ws-name">Invoices</div>
+        </div>
+        <div class="ws-pct">60%</div>
+      </div>
+      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:60%"></div></div>
+      <div class="ws-tasks">
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">generateInvoiceNumber (INV-YYYYMM-NNN, atomic sequence)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">createInvoice, getInvoicesByUser, updateInvoiceStatus</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">addLineItem, getLineItems, calculateInvoiceTotals</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">GST calculation (10% including mileage at $0.91/km)</span></div>
+        <div class="task done"><span class="task-icon">&#10003;</span> <span class="task-text">10 unit tests passing</span></div>
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Invoice creation flow: select client &rarr; unbilled entries &rarr; generate</span></div>
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Invoice PDF/print view</span></div>
+      </div>
+    </div>
+
+    <!-- Phase 5: Dashboard — 0% -->
+    <div class="ws-card ws-slate">
+      <div class="ws-band">
+        <div>
+          <div class="ws-id">Phase 5 &middot; Features</div>
+          <div class="ws-name">Dashboard &amp; Charts</div>
+        </div>
+        <div class="ws-pct">0%</div>
+      </div>
+      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:0%"></div></div>
+      <div class="ws-tasks">
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Wire stat cards to real data (today, week, unbilled, outstanding)</span></div>
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Recharts: utilisation chart, revenue by client</span></div>
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Aged receivables chart</span></div>
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Recent entries list on dashboard</span></div>
+      </div>
+    </div>
+
+    <!-- Phase 6: Settings — 0% -->
+    <div class="ws-card ws-slate">
+      <div class="ws-band">
+        <div>
+          <div class="ws-id">Phase 6 &middot; Polish</div>
+          <div class="ws-name">Settings &amp; Polish</div>
+        </div>
+        <div class="ws-pct">0%</div>
+      </div>
+      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:0%"></div></div>
+      <div class="ws-tasks">
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Persist business profile to business_profiles table</span></div>
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Save bank details for invoices</span></div>
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Invoice prefix, GST rate, mileage rate configuration</span></div>
+      </div>
+    </div>
+
+    <!-- Phase 7: Xero — 0% -->
+    <div class="ws-card ws-slate">
+      <div class="ws-band">
+        <div>
+          <div class="ws-id">Phase 7 &middot; Integration</div>
+          <div class="ws-name">Xero Integration</div>
+        </div>
+        <div class="ws-pct">0%</div>
+      </div>
+      <div class="ws-bar-track"><div class="ws-bar-fill" style="width:0%"></div></div>
+      <div class="ws-tasks">
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">OAuth2 connect flow (granular scopes)</span></div>
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Contact sync (clients &rarr; Xero contacts)</span></div>
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Invoice push (PiTime &rarr; Xero)</span></div>
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Payment webhook (Xero payment &rarr; mark paid)</span></div>
+        <div class="task"><span class="task-icon">&#9675;</span> <span class="task-text">Token refresh management</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── LEGEND ── -->
+  <div class="legend">
+    <div class="legend-item"><span class="stat-dot done"></span> Done</div>
+    <div class="legend-item"><span class="stat-dot progress"></span> Backend Done (UI pending)</div>
+    <div class="legend-item"><span class="stat-dot todo"></span> Not Started</div>
+  </div>
+
+</div>
+</body>
+</html>
