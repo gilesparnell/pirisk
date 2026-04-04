@@ -20,7 +20,7 @@ import { signOutAction } from "./sign-out-action";
 
 const navItems = [
   { href: "/app", label: "Dashboard", icon: BarChart3 },
-  { href: "/app/entries", label: "Time Entries", icon: Clock },
+  { href: "/app/entries?voice=1", label: "Time Entries", icon: Clock },
   { href: "/app/clients", label: "Clients", icon: Users },
   { href: "/app/invoices", label: "Invoices", icon: FileText },
   { href: "/app/settings", label: "Settings", icon: Settings },
