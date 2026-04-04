@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 // useTransition used for save, useState for parse (to show errors)
-import { Mic, Loader2 } from "lucide-react";
+import { Mic, MicOff, Loader2, Save } from "lucide-react";
 import {
   addEntry,
   addVoiceEntry,
@@ -10,13 +10,22 @@ import {
   type ClientWithProjects,
   type ActionResult,
 } from "./actions";
+import { useSpeechRecognition } from "./use-speech-recognition";
+import {
+  getMissingFields,
+  getConversationalPrompt,
+  detectVoiceCommand,
+  type ParsedEntryState,
+} from "./voice-conversation";
 
 export function EntryForm({
   clients,
   onDone,
+  autoVoice = false,
 }: {
   clients: ClientWithProjects[];
   onDone: () => void;
+  autoVoice?: boolean;
 }) {
   const [voiceInput, setVoiceInput] = useState("");
   const [selectedClientId, setSelectedClientId] = useState("");
@@ -30,6 +39,38 @@ export function EntryForm({
   const [parseStatus, setParseStatus] = useState<string | null>(null);
   const [isParsing, setIsParsing] = useState(false);
   const [isSaving, startSaving] = useTransition();
+  const [conversationPrompt, setConversationPrompt] = useState<string | null>(null);
+  const [readyToSave, setReadyToSave] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Refs to keep current form values accessible inside async closures
+  const hoursRef = useRef(hours);
+  hoursRef.current = hours;
+  const clientIdRef = useRef(selectedClientId);
+  clientIdRef.current = selectedClientId;
+  const projectIdRef = useRef(selectedProjectId);
+  projectIdRef.current = selectedProjectId;
+  const descriptionRef = useRef(description);
+  descriptionRef.current = description;
+
+  // Speech recognition with conversational flow
+  const speech = useSpeechRecognition((transcript) => {
+    setVoiceInput(transcript);
+    if (transcript.trim()) {
+      setTimeout(() => handleVoiceResult(transcript), 100);
+    }
+  });
+
+  // Auto-start voice recognition when arriving from the big green button
+  useEffect(() => {
+    if (autoVoice && speech.isSupported && !speech.isListening) {
+      // Small delay to let the component mount
+      const timer = setTimeout(() => speech.startListening(), 300);
+      return () => clearTimeout(timer);
+    }
+    // Only run on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const selectedClient = clients.find((c) => c.id === selectedClientId);
   const activeProjects =
@@ -40,40 +81,54 @@ export function EntryForm({
     setSelectedProjectId("");
   }
 
-  async function handleParse() {
-    if (!voiceInput.trim()) return;
+  // Returns the effective state after parsing (avoids stale React state)
+  async function handleParseText(text: string): Promise<ParsedEntryState | null> {
+    if (!text.trim()) return null;
     setIsParsing(true);
     setParseStatus(null);
+    setConversationPrompt(null);
     try {
-      const parsed = await parseVoiceInput(voiceInput);
+      const parsed = await parseVoiceInput(text);
 
-      // Build a human-readable status
+      // Track what we matched/missed for status display
       const matched: string[] = [];
       const missed: string[] = [];
 
+      // Build the effective state, merging new parse results with current form values (via refs)
+      let effectiveHours = hoursRef.current;
+      let effectiveClientId = clientIdRef.current;
+      let effectiveProjectId = projectIdRef.current;
+      let effectiveDescription = descriptionRef.current;
+
       if (parsed.hours > 0) {
-        setHours(String(parsed.hours));
+        effectiveHours = String(parsed.hours);
+        setHours(effectiveHours);
         matched.push(`${parsed.hours}h`);
-      } else {
+      } else if (!effectiveHours) {
         missed.push("hours");
       }
 
       if (parsed.clientMatch) {
-        setSelectedClientId(parsed.clientMatch);
+        effectiveClientId = parsed.clientMatch;
+        setSelectedClientId(effectiveClientId);
         const client = clients.find((c) => c.id === parsed.clientMatch);
         matched.push(client?.name ?? "client");
         if (parsed.projectMatch) {
-          setSelectedProjectId(parsed.projectMatch);
+          effectiveProjectId = parsed.projectMatch;
+          setSelectedProjectId(effectiveProjectId);
           const project = client?.projects.find((p) => p.id === parsed.projectMatch);
           matched.push(project?.name ?? "project");
-        } else {
+        } else if (!effectiveProjectId) {
           missed.push("project");
         }
-      } else {
+      } else if (!effectiveClientId) {
         missed.push("client");
       }
 
-      if (parsed.description) setDescription(parsed.description);
+      if (parsed.description) {
+        effectiveDescription = parsed.description;
+        setDescription(effectiveDescription);
+      }
       if (parsed.mileageKm) {
         setMileageKm(String(parsed.mileageKm));
         matched.push(`${parsed.mileageKm}km`);
@@ -83,11 +138,72 @@ export function EntryForm({
       if (matched.length > 0) parts.push(`Matched: ${matched.join(", ")}`);
       if (missed.length > 0) parts.push(`Not found: ${missed.join(", ")}`);
       setParseStatus(parts.join(" · ") || "No matches found — select manually below");
+
+      return {
+        hours: effectiveHours,
+        clientId: effectiveClientId,
+        projectId: effectiveProjectId,
+        description: effectiveDescription,
+      };
     } catch (err) {
       setParseStatus(`Parse failed: ${err instanceof Error ? err.message : "unknown error"}`);
+      return null;
     } finally {
       setIsParsing(false);
     }
+  }
+
+  function promptForMissing(state: ParsedEntryState) {
+    const missing = getMissingFields(state);
+    if (missing.length > 0) {
+      setReadyToSave(false);
+      setConversationPrompt(getConversationalPrompt(missing));
+      // Auto-restart mic for follow-up
+      if (speech.isSupported && !speech.isListening) {
+        setTimeout(() => speech.startListening(), 500);
+      }
+    } else {
+      setReadyToSave(true);
+      setConversationPrompt('Say "save entry" or tap the button below. You can also say "add note" for a description.');
+    }
+  }
+
+  function triggerSave() {
+    if (formRef.current) {
+      formRef.current.requestSubmit();
+    }
+  }
+
+  async function handleVoiceResult(transcript: string) {
+    const cmd = detectVoiceCommand(transcript);
+
+    if (cmd.command === "save-entry") {
+      triggerSave();
+      return;
+    }
+
+    if (cmd.command === "add-note") {
+      if (cmd.payload) {
+        setDescription((prev) => (prev ? `${prev}. ${cmd.payload}` : cmd.payload));
+        setConversationPrompt(`Note added: "${cmd.payload}"`);
+      } else {
+        setConversationPrompt("Say your note now...");
+        if (speech.isSupported) {
+          setTimeout(() => speech.startListening(), 500);
+        }
+      }
+      return;
+    }
+
+    // Parse and check what's still missing
+    const state = await handleParseText(transcript);
+    if (state) promptForMissing(state);
+  }
+
+  function handleParse() {
+    handleParseText(voiceInput).then((state) => {
+      if (state) promptForMissing(state);
+    });
   }
 
   function handleVoiceKeyDown(e: React.KeyboardEvent) {
@@ -119,6 +235,9 @@ export function EntryForm({
     setBillable(true);
     setDate(new Date().toISOString().split("T")[0]);
     setErrors({});
+    setConversationPrompt(null);
+    setParseStatus(null);
+    setReadyToSave(false);
   }
 
   return (
@@ -131,7 +250,44 @@ export function EntryForm({
           <Mic className="inline h-4 w-4 mr-1 text-teal-600" />
           Voice / Quick Entry
         </label>
+
+        {/* Listening indicator */}
+        {speech.isListening && (
+          <div className="mb-3 flex items-center gap-3 rounded-lg bg-teal-50 border border-teal-200 px-4 py-3">
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-teal-500" />
+            </span>
+            <span className="text-sm font-medium text-teal-700">Listening... speak now</span>
+            <button
+              type="button"
+              onClick={speech.stopListening}
+              className="ml-auto text-teal-600 hover:text-teal-800"
+            >
+              <MicOff className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
         <div className="flex gap-3">
+          {speech.isSupported && (
+            <button
+              type="button"
+              onClick={speech.isListening ? speech.stopListening : speech.startListening}
+              className={`inline-flex items-center justify-center rounded-lg px-3 py-2.5 transition-colors ${
+                speech.isListening
+                  ? "bg-red-100 text-red-600 border border-red-300 hover:bg-red-200"
+                  : "bg-teal-50 text-teal-600 border border-teal-300 hover:bg-teal-100"
+              }`}
+              aria-label={speech.isListening ? "Stop listening" : "Start voice input"}
+            >
+              {speech.isListening ? (
+                <MicOff className="h-5 w-5" />
+              ) : (
+                <Mic className="h-5 w-5" />
+              )}
+            </button>
+          )}
           <input
             type="text"
             value={voiceInput}
@@ -151,8 +307,11 @@ export function EntryForm({
             Parse
           </button>
         </div>
+        {speech.error && (
+          <p className="mt-2 text-xs text-red-600">{speech.error}</p>
+        )}
         <p className="mt-1 text-xs text-gray-400">
-          Use Wispr Flow to dictate, or type naturally. We&apos;ll parse the
+          Tap the mic or use Wispr Flow to dictate. We&apos;ll parse the
           client, project, hours, and description.
         </p>
         {parseStatus && (
@@ -166,9 +325,35 @@ export function EntryForm({
             {parseStatus}
           </div>
         )}
+        {readyToSave && (
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={triggerSave}
+              disabled={isSaving}
+              className="w-full flex items-center justify-center gap-3 rounded-2xl bg-blue-600 px-8 py-5 text-lg font-bold text-white shadow-lg hover:bg-blue-700 active:scale-[0.98] transition-all disabled:opacity-50"
+            >
+              {isSaving ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                <Save className="h-6 w-6" />
+              )}
+              Save Entry
+            </button>
+            <p className="mt-2 text-center text-xs text-gray-400">
+              or say &quot;save entry&quot; · &quot;add note&quot; for a description
+            </p>
+          </div>
+        )}
+        {conversationPrompt && !readyToSave && (
+          <div className="mt-2 rounded-lg px-4 py-3 text-sm bg-blue-50 text-blue-800 border border-blue-200 flex items-center gap-2">
+            <Mic className="h-4 w-4 text-blue-500 flex-shrink-0" />
+            <span>{conversationPrompt}</span>
+          </div>
+        )}
       </div>
 
-      <form action={handleSubmit}>
+      <form ref={formRef} action={handleSubmit}>
         <div className="border-t border-gray-100 pt-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div>

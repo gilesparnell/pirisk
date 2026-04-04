@@ -11,7 +11,7 @@ function generateId() {
 // ─── User CRUD ──────────────────────────────────────────────
 
 export async function getUserByEmail(db: DB, email: string) {
-  return db.select().from(users).where(eq(users.email, email)).get();
+  return db.select().from(users).where(eq(users.email, email.toLowerCase())).get();
 }
 
 export async function getUserById(db: DB, id: string) {

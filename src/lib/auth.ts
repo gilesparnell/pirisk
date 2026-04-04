@@ -60,14 +60,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return "/login?error=AccessDenied";
       }
 
+      const email = user.email.toLowerCase();
+
       try {
-        const allowed = await isEmailAllowed(db, user.email);
+        const allowed = await isEmailAllowed(db, email);
         if (!allowed) {
           return "/login?error=AccessDenied";
         }
 
         await upsertUser(db, {
-          email: user.email,
+          email,
           name: user.name,
           image: user.image,
         });
@@ -81,7 +83,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
     async jwt({ token, user }) {
       if (user?.email) {
-        const dbUser = await getUserByEmail(db, user.email);
+        const email = user.email.toLowerCase();
+        const dbUser = await getUserByEmail(db, email);
         if (dbUser) {
           token.id = dbUser.id;
           token.status = dbUser.status;

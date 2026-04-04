@@ -37,7 +37,7 @@ export default async function LoginPage({
         <form
           action={async () => {
             "use server";
-            await signIn("google", { redirectTo: "/app" });
+            await signIn("google", { redirectTo: "/app/entries?voice=1" });
           }}
         >
           <button
@@ -72,7 +72,7 @@ export default async function LoginPage({
               "use server";
               await signIn("dev-login", {
                 email: formData.get("email") as string,
-                redirectTo: "/app",
+                redirectTo: "/app/entries?voice=1",
               });
             }}
             className="mt-4"

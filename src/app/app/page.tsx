@@ -73,6 +73,7 @@ export default async function PiTimeDashboard() {
 
   return (
     <div>
+      {/* Dashboard content */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
         <p className="mt-1 text-sm text-gray-500">
@@ -136,7 +137,7 @@ export default async function PiTimeDashboard() {
 
       {/* Quick Actions + Recent Entries */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl bg-white border border-gray-200 p-8">
+        <div className="hidden lg:block rounded-2xl bg-white border border-gray-200 p-8">
           <div className="text-center">
             <div className="mx-auto h-12 w-12 rounded-full bg-teal-50 flex items-center justify-center mb-4">
               <Clock className="h-6 w-6 text-teal-600" />
